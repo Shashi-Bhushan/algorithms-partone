@@ -1,5 +1,8 @@
 ﻿# Week 1 notes
 
+in Part 1, the focus is to answer whether there is a path that connects two objects.
+
+The focus is not on finding the path between two objects i.e. algorithms like Dikshtra's algorithm.
 
 ## Union find: the dynamic connectivity problem
 
@@ -13,6 +16,7 @@ The solutions efficiently supports these two operations.
 
 ### Modeling the connections
 
+We assume that the connection between two components _p_ and _q_ is and equivalence relation. It means
 * Reflexive: _p_ is connected to _p_
 * Symmetric: if _p_ is connected to _q_, then _q_ is connected to _p_
 * Transitive: if _p_ is connected to _q_ and _q_ is connected to _r_, then _p_ is connected to _r_
@@ -24,7 +28,7 @@ _e.g._ { 0 } { 1 4 5 } { 2 3 6 7 }
 
 ### Implementing the operations
 
-* __Find query:__ Check if two objects are in the same componant
+* __Find query:__ Check if two objects are in the same component
 * __Union command:__ replace components containing two objects with their union
 
 _e.g._
@@ -86,11 +90,11 @@ E.g. huge problem for quick-find
 
 ## Quick union
 
-Same data structure as quick find. But the array represents a set of trees (called a "forrest"). The root of _i_ is id[id[id[…id[i]…]]].
+Same data structure as quick find. But the array represents a set of trees (called a "forest"). The root of _i_ is id[id[id[…id[i]…]]].
 
 __Find:__ Check whether _p_ and _q_ have the same root
 
-__Union:__ To merge componants containing _p_ and _q_, set the id of _p_'s root to the id of _q_'s root.
+__Union:__ To merge components containing _p_ and _q_, set the id of _p_'s root to the id of _q_'s root.
 
 ### Quick union is too slow
 

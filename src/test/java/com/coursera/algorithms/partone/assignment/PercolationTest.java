@@ -17,6 +17,9 @@ public class PercolationTest {
 		percolation = new Percolation(5);
 	}
 	
+	/**
+	 * Test whether the Site is marked as open once {@link Percolation#open(int, int)} is called on the matrix 
+	 */
 	@Test
 	public void basicOpenTest() {
 		assertFalse( percolation.isOpen(0, 0));
@@ -26,6 +29,9 @@ public class PercolationTest {
 		assertTrue( percolation.isOpen(0, 0));
 	}
 	
+	/**
+	 * Tests whether the Sites are assigned Full state after they meet all the conditions of being FULL
+	 */
 	@Test
 	public void basicFullTest() {
 		assertFalse( percolation.isFull(0, 3));
@@ -54,6 +60,9 @@ public class PercolationTest {
 		assertFalse( percolation.isFull(2, 3));
 	}
 	
+	/**
+	 * Tests whether the System Vertically percolates
+	 */
 	@Test
 	public void percolationTest(){
 		assertFalse( percolation.percolates());

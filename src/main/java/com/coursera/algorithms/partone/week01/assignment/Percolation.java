@@ -1,139 +1,112 @@
 package com.coursera.algorithms.partone.week01.assignment;
 
+/**
+ * Percolation Matrix is a N * N matrix of Sites
+ * - Each site is either blocked or open
+ * - An open site is full, iff it is connected to the top via open sites
+ * @author shabhushan
+ *
+ */
 public class Percolation {
 	
-	private boolean[][] percolationArray;
-	private int[][] id;
-	private int[][] size;
-	private boolean[][] isFull;
-	
+	/**
+	 * Interpretation is that percolation array signifies which Sites in matrix are open
+	 * A site will be open only if it's corresponding value is true
+	 */
+	private boolean[][] open;
+	/**
+	 * N is the Row or Column number of the N * N square matrix
+	 */
 	private final int N;
 	
 	/**
-	 * create n-by-n grid, with all sites blocked
+	 * create N-by-N grid, with all sites blocked
 	 * 
 	 * Initially
 	 * - Each site will be blocked 
-	 * - Each site will have unique parent entry. i.e. the site is it's own parent
 	 */
 	public Percolation(int N) {
 		this.N = N;
 		
-		percolationArray = new boolean[N][N];
-		id = new int[N][N];
-		size = new int[N][N];
-		isFull = new boolean[N][N];
+		open = new boolean[N][N];
 		
 		for(int row = 0; row < N; row++) {
 			for(int column = 0; column < N; column++) {
 				// will be false anyway by default. Anyway, adding for clarification
-				percolationArray[row][column] = false;
-				
-				id[row][column] = row * N + column;
-				
-				size[row][column] = 1;
-				
-				isFull[row][column] = false;
+				open[row][column] = false;
 			}
 		}
 	}
 	
+	/**
+	 * Open the site and check if it is Full
+	 * @param row
+	 * @param col
+	 */
 	public void open(int row, int col) {       // open site (row, col) if it is not open already
-		percolationArray[row][col] = true;
+		open[row][col] = true;
+	}
+	
+	public boolean isOpen(int row, int col) {  // is site (row, col) open?
+		return open[row][col];
+	}
+	
+	public boolean isFull(int row, int col) {  // is site (row, col) full?
 		
-		boolean isFull = true;
+		boolean[][] full = getFullMatrix(open);
 		
-		// Now, need to connect to adjacent sites if they are open
-		// Left Site
-		if(0 < col && percolationArray[row][col - 1]) {
-			unionInternal( new Point(row, col), new Point(row, col - 1));
-		} else {
-			isFull = false;
-		}
-		// Right Site
-		if(col < percolationArray.length && percolationArray[row][col + 1]) {
-			unionInternal( new Point(row, col), new Point(row, col + 1));
-		} else {
-			isFull = false;
-		}
-		// Up Site
-		if(0 < row && percolationArray[row - 1][col]) {
-			unionInternal( new Point(row - 1, col), new Point(row, col));
-		} else {
-			isFull = false;
-		}
-		// Down Site
-		if(row < percolationArray.length && percolationArray[row + 1][col]) {
-			unionInternal(new Point(row + 1, col), new Point(row, col));
-		} else {
-			isFull = false;
+		return full[row][col];
+	}
+	
+	public boolean percolates() {              // does the system percolate?
+		
+		boolean[][] full = getFullMatrix(open);
+		
+		// Last row has any Full Site, then System percolates
+		for(int index = 0; index < N; index++) {
+			if(full[N - 1][index]){
+				return true;
+			}
 		}
 		
-		this.isFull[row][col] = isFull;
+		return false;
 	}
 	
 	/**
-	 * Merge Site id[r1][c1] with id[r2][c2]
+	 * Returns a Full Matrix having details about what Sites are Full in the Matrix
+	 * isFull array will keep count of how many Sites in the matrix are connected to the top
 	 * 
+	 * @param open
+	 * @return
 	 */
-	private void unionInternal(Point p1, Point p2) {
-		Point pRoot = rootInternal(p1.getX(), p1.getY());
-		Point qRoot = rootInternal(p2.getX(), p2.getY());
+	private boolean[][] getFullMatrix(boolean[][] open) {
 		
+		boolean[][] full = new boolean[N][N];
 		
-		int pRootX = pRoot.getX();
-		int pRootY = pRoot.getY();
-		int qRootX = qRoot.getX();
-		int qRootY = qRoot.getY();
-		
-		// Merge one into another, considering Size as well
-		if(size[pRootX][pRootY] < size[qRootX][qRootY]) {
-			id[pRootX][pRootY] = qRootX * N + qRootY;
-			
-			size[qRootX][qRootY] = size[qRootX][qRootY] + size[pRootX][pRootY];
-		} else {
-			id[qRootX][qRootY] = pRootX * N + pRootY;
-			
-			size[pRootX][pRootY] = size[pRootX][pRootY] + size[qRootX][qRootY];
-		}
-	}
-	
-	private Point rootInternal(int row, int column) {
-		int r = row;
-		int c = column;
-		
-		while(r * N + c != id[r][c]) {
-			r = id[r][c] / N;
-			c = id[r][c] % N;
+		// copy First Row from open 
+		for(int index = 0; index < N; index++) {
+			full[0][index] = open[0][index];
 		}
 		
-		return new Point(r, c); //r * N + c;
-	}
-	
-	
-	
-	public boolean isOpen(int row, int col) {  // is site (row, col) open?
-		return percolationArray[row][col];
-	}
-	public boolean isFull(int row, int col) {  // is site (row, col) full?
-		
-		if(isFull[row][col]) {
-			return true;
-		} else if(
-									   (0 < col && percolationArray[row][col - 1])
-		&& (0 < row && percolationArray[row - 1][col]) 								&& (row < this.N && percolationArray[row + 1][col])
-									&& (col < this.N && percolationArray[row][col + 1])		
-		) {
-			// TODO: Bug here
-			// if col is zero, it fails
-			isFull[row][col] = true;
-			return true;
-		} else {
-			return false;
+		// Check if other rows percolated
+		for(int row = 1; row < N; row++) {
+			for(int col = 0; col < N; col++) {
+				// if cell is open and any one adjacent is Full
+				 if( open[row][col] && (
+						 							// TOP SITE
+						   						(0 < col ? full[row][col - 1] : true)
+						   		// LEFT SITE												// RIGHT SITE
+					|| (0 < row ? full[row - 1][col] : true) 						|| (row < this.N ? full[row + 1][col] : true)
+													// BOTTOM SITE
+											|| (col < this.N ? full[row][col + 1] : true)		
+						 )
+					) {
+					 full[row][col] = true;
+				 }
+			}
 		}
-	}
-	public boolean percolates() {              // does the system percolate?
-		return false;
+		
+		return full;
 	}
 	
 	/**
